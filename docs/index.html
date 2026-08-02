@@ -6,298 +6,317 @@
     <title>电费监控</title>
     <style>
         :root {
-            --bg: #0b0f12; --card: #141820; --border: #1e2530;
-            --text: #d4d8dd; --muted: #6b7280;
-            --accent: #f59e0b; --green: #10b981; --red: #ef4444;
-            --radius: 12px;
+            --bg:#0b0f12;--card:#141820;--border:#1e2530;--text:#d4d8dd;
+            --muted:#6b7280;--accent:#f59e0b;--green:#10b981;--red:#ef4444;--radius:12px;
         }
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:12px}
         .container{max-width:520px;margin:0 auto}
 
-        /* 顶栏 */
-        .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-        .topbar h1{font-size:1.2rem;font-weight:700}
-        .actions{display:flex;gap:8px}
-        .btn{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:0.78rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:.15s}
-        .btn:hover{background:#1f2630;border-color:#3a4250}
-        .btn.refresh{color:var(--accent);border-color:rgba(245,158,11,.3)}
-        .btn.trigger{color:var(--green);border-color:rgba(16,185,129,.3)}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .spinning{animation:spin .8s linear infinite}
+        .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+        .topbar h1{font-size:1.1rem;font-weight:700}
+        .btn{padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:.72rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:.15s}
+        .btn:hover{background:#1f2630}
+        .btn.trig{border-color:rgba(16,185,129,.3);color:var(--green)}
 
         /* 主卡片 */
-        .main-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;text-align:center;margin-bottom:16px}
-        .icon{width:44px;height:44px;margin:0 auto 12px;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.05));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
-        .unit-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:3px;margin-bottom:2px}
-        .kwh-num{font-size:3rem;font-weight:800;letter-spacing:-2px;line-height:1.1}
-        .kwh-num .num.low{color:var(--red)} .kwh-num .num.mid{color:var(--accent)} .kwh-num .num.ok{color:var(--green)}
-        .kwh-num .unit{font-size:.85rem;font-weight:400;color:var(--muted)}
-        .info-row{display:flex;justify-content:center;gap:24px;margin-top:16px;font-size:.78rem;color:var(--muted);flex-wrap:wrap}
-        .info-row span{display:flex;align-items:center;gap:4px}
-        .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
-        .dot.ok{background:var(--green)} .dot.err{background:var(--red)}
+        .main-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px;text-align:center;margin-bottom:12px}
+        .icon-row{width:38px;height:38px;margin:0 auto 8px;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.05));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+        .slabel{font-size:.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+        .kwh-num{font-size:2.6rem;font-weight:800;letter-spacing:-1px;line-height:1.1}
+        .kwh-num .num.low{color:var(--red)}.kwh-num .num.mid{color:var(--accent)}.kwh-num .num.ok{color:var(--green)}
+        .kwh-num .unit{font-size:.75rem;font-weight:400;color:var(--muted)}
+        .info-line{display:flex;justify-content:center;gap:18px;margin-top:12px;font-size:.72rem;color:var(--muted);flex-wrap:wrap}
+        .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+        .dot.ok{background:var(--green)}.dot.err{background:var(--red)}
 
-        /* 趋势图卡片 */
-        .chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
-        .chart-title{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;text-align:center}
-        .chart-wrap{position:relative}
-        #trendSvg{width:100%;height:200px;display:block}
-        .chart-legend{display:flex;justify-content:center;gap:20px;font-size:.68rem;color:var(--muted);margin-top:8px}
-        .legend-low{color:var(--red)} .legend-warn{color:var(--accent)} .legend-ok{color:var(--green)}
+        /* 周趋势图 */
+        .chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+        .chart-title{font-size:.7rem;color:var(--muted);letter-spacing:2px;text-align:center;margin-bottom:10px}
+        #trendSvg{width:100%;height:170px;display:block}
 
-        /* 历史表 */
-        .history-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
-        .history-title{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;text-align:center}
-        .h-table{width:100%;font-size:.78rem;border-collapse:collapse}
-        .h-table th{text-align:left;padding:6px 8px;color:var(--muted);font-weight:400;font-size:.68rem;border-bottom:1px solid rgba(255,255,255,.05)}
-        .h-table td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
-        .h-kwh{font-weight:700;font-variant-numeric:tabular-nums}
-        .h-kwh.low{color:var(--red)} .h-kwh.mid{color:var(--accent)} .h-kwh.ok{color:var(--green)}
-        .h-delta{font-size:.7rem}
-        .h-delta.down{color:var(--red)} .h-delta.up{color:var(--green)} .h-delta.flat{color:var(--muted)}
+        /* 日报表 */
+        .daily-section{margin-bottom:12px}
+        .day-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;cursor:pointer;transition:.15s}
+        .day-card:hover{border-color:#2e3a48}
+        .day-card.active{border-color:var(--accent)}
+        .day-header{display:flex;align-items:center;padding:12px 14px;gap:10px}
+        .day-date{font-size:.85rem;font-weight:600;min-width:55px}
+        .day-bar-wrap{flex:1;height:8px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden;position:relative}
+        .day-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+        .day-bar-fill.low{background:var(--red)}.day-bar-fill.mid{background:var(--accent)}.day-bar-fill.ok{background:var(--green)}
+        .day-kwh{font-size:.85rem;font-weight:700;min-width:52px;text-align:right}
+        .day-consum{font-size:.68rem;color:var(--muted);min-width:40px;text-align:right}
+        .day-arrow{font-size:.6rem;color:var(--muted);transition:.2s}
+        .day-card.active .day-arrow{transform:rotate(90deg)}
 
-        .footer{text-align:center;font-size:.65rem;color:var(--muted);opacity:.4;padding:12px 0 24px}
-        .error-msg{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px;color:var(--red);font-size:.82rem;text-align:center;margin-bottom:16px;display:none}
+        /* 每日展开 */
+        .day-detail{display:none;border-top:1px solid var(--border);padding:8px 14px 12px}
+        .day-card.active .day-detail{display:block}
+        .hour-list{display:flex;flex-direction:column;gap:2px}
+        .hour-row{display:flex;align-items:center;padding:4px 0;font-size:.75rem;gap:10px}
+        .hour-time{color:var(--muted);min-width:48px}
+        .hour-bar-bg{flex:1;height:4px;background:rgba(255,255,255,.03);border-radius:2px;overflow:hidden}
+        .hour-bar-fill{height:100%;border-radius:2px}
+        .hour-bar-fill.low{background:var(--red)}.hour-bar-fill.mid{background:var(--accent)}.hour-bar-fill.ok{background:var(--green)}
+        .hour-kwh{font-weight:600;min-width:48px;text-align:right;font-variant-numeric:tabular-nums}
+        .day-empty{text-align:center;color:var(--muted);padding:8px;font-size:.75rem}
 
-        @media(max-width:420px){
-            .kwh-num{font-size:2.4rem}
-            .main-card{padding:20px 14px}
-            .chart-card{padding:12px}
-            #trendSvg{height:150px}
+        .error-msg{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px;color:var(--red);font-size:.78rem;text-align:center;margin-bottom:12px;display:none}
+        .footer{text-align:center;font-size:.62rem;color:var(--muted);opacity:.4;padding:8px 0 20px}
+
+        @media(max-width:400px){
+            .kwh-num{font-size:2rem}
+            .day-header{padding:10px;gap:6px}
+            .day-date{font-size:.75rem;min-width:48px}
+            .day-kwh{font-size:.75rem;min-width:44px}
+            .day-consum{font-size:.62rem;min-width:34px}
         }
     </style>
 </head>
 <body>
 <div class="container">
-
-    <!-- 顶栏 -->
     <div class="topbar">
         <h1>⚡ 电费监控</h1>
-        <div class="actions">
-            <a class="btn trigger" id="btnTrigger" href="#" target="_blank" title="手动触发更新">🔄 更新</a>
-        </div>
+        <a class="btn trig" id="btnTrigger" href="#" target="_blank">🔄 更新</a>
     </div>
 
-    <!-- 错误 -->
     <div class="error-msg" id="errorBox"></div>
 
     <!-- 主卡片 -->
     <div class="main-card">
-        <div class="icon">⚡</div>
-        <div class="unit-label">剩余电量</div>
+        <div class="icon-row">⚡</div>
+        <div class="slabel">剩余电量</div>
         <div class="kwh-num"><span class="num" id="kwhVal">--</span><span class="unit">度</span></div>
-        <div class="info-row">
+        <div class="info-line">
             <span>👤 <span id="tenant">--</span></span>
-            <span>📅 <span id="upTime">--</span></span>
-            <span><span class="dot ok" id="statusDot"></span>正常</span>
+            <span><span class="dot ok" id="statusDot"></span> <span id="upTime">--</span></span>
         </div>
     </div>
 
-    <!-- 趋势图 -->
+    <!-- 周趋势 -->
     <div class="chart-card">
-        <div class="chart-title">📈 电量趋势</div>
-        <div class="chart-wrap">
-            <svg id="trendSvg" viewBox="0 0 480 200" preserveAspectRatio="none"></svg>
-        </div>
-        <div class="chart-legend">
-            <span class="legend-low">🔴 &lt;30 告警</span>
-            <span class="legend-warn">🟡 30-80 注意</span>
-            <span class="legend-ok">🟢 &gt;80 正常</span>
-        </div>
+        <div class="chart-title">📈 近7天趋势</div>
+        <svg id="trendSvg" viewBox="0 0 480 170" preserveAspectRatio="none"></svg>
     </div>
 
-    <!-- 历史列表 -->
-    <div class="history-card">
-        <div class="history-title">📋 历史记录</div>
-        <table class="h-table">
-            <thead><tr><th>时间</th><th>电量</th><th>变化</th></tr></thead>
-            <tbody id="historyBody"></tbody>
-        </table>
-    </div>
+    <!-- 每日明细 -->
+    <div class="daily-section" id="dailyList"></div>
 
-    <div class="footer">数据来源 i8oa · GitHub Actions 自动更新 · <span id="autoRefresh">每5分钟自动刷新</span></div>
+    <div class="footer">i8oa · Actions 自动更新 · <span id="refreshHint">每5分钟刷新</span></div>
 </div>
 
 <script>
     const DATA_URL = 'data/dianfei.json';
     const REPO = '690878173/cs_dianfei';
-    const REFRESH_INTERVAL = 5 * 60 * 1000;  // 5分钟
+    const REFRESH = 5 * 60 * 1000;
 
-    function fmtTime(iso) {
-        if (!iso) return '--';
+    function fmtHM(iso) {
         const d = new Date(iso);
-        return d.toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+        return d.toLocaleString('zh-CN',{hour:'2-digit',minute:'2-digit'});
     }
-
+    function fmtDate(iso) {
+        const d = new Date(iso);
+        return d.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit'});
+    }
     function ago(iso) {
-        if (!iso) return '--';
-        const diff = Date.now() - new Date(iso);
-        if (diff < 6e4) return '刚刚';
-        if (diff < 36e5) return Math.floor(diff/6e4) + '分钟前';
-        if (diff < 864e5) return Math.floor(diff/36e5) + '小时前';
-        return Math.floor(diff/864e5) + '天前';
+        if(!iso) return '--';
+        const d = Date.now() - new Date(iso);
+        if(d<6e4) return '刚刚';
+        if(d<36e5) return Math.floor(d/6e4)+'分钟前';
+        if(d<864e5) return Math.floor(d/36e5)+'小时前';
+        return Math.floor(d/864e5)+'天前';
+    }
+    function cls(v) {
+        if(v==null)return'';
+        return v<30?'low':(v<80?'mid':'ok');
+    }
+    function dayKey(iso) { return iso.slice(0,10); }
+
+    // ===== 按天分组 =====
+    function groupByDay(history) {
+        const map = {};
+        for (const h of history) {
+            const dk = dayKey(h.time);
+            if (!map[dk]) map[dk] = [];
+            map[dk].push(h);
+        }
+        // 排序
+        const days = Object.entries(map).map(([date,items]) => {
+            items.sort((a,b)=>new Date(a.time)-new Date(b.time));
+            const vals = items.map(i=>i.kwh).filter(v=>v!=null);
+            return {
+                date,
+                items,
+                first: items[0],
+                last: items[items.length-1],
+                min: Math.min(...vals),
+                max: Math.max(...vals),
+                count: items.length,
+            };
+        });
+        days.sort((a,b)=>b.date.localeCompare(a.date)); // 最新在前
+        return days;
     }
 
-    function kwhClass(v) {
-        if (v == null) return '';
-        return v < 30 ? 'low' : (v < 80 ? 'mid' : 'ok');
-    }
-
-    // ===== 趋势图 (纯 SVG) =====
-    function drawTrend(history) {
+    // ===== SVG 周趋势 =====
+    function drawTrend(days) {
         const svg = document.getElementById('trendSvg');
-        if (!history || history.length < 1) {
-            svg.innerHTML = '<text x="240" y="100" text-anchor="middle" fill="#6b7280" font-size="12">暂无数据</text>';
-            return;
+        const W=480, H=170, pad={top:12,right:16,bottom:26,left:16};
+        const pw=W-pad.left-pad.right, ph=H-pad.top-pad.bottom;
+
+        // 取最近7天, 用每日最后一条数据
+        const recent = days.slice(0,7).reverse(); // 从旧到新
+        if(!recent.length){svg.innerHTML='<text x="240" y="85" text-anchor="middle" fill="#6b7280" font-size="12">暂无数据</text>';return;}
+
+        const vals = recent.map(d=>d.last.kwh).filter(v=>v!=null);
+        if(!vals.length) return;
+        const maxV = Math.max(...vals,100), minV = Math.min(...vals,0);
+        const range = maxV - minV || 1;
+
+        const pts = recent.map((d,i)=>({
+            x: pad.left+(recent.length===1?pw/2:(i/(recent.length-1))*pw),
+            y: pad.top+ph-((d.last.kwh-minV)/range)*ph,
+            kwh: d.last.kwh,
+            date: d.date,
+        }));
+
+        let pathD='', areaD='';
+        pts.forEach((p,i)=>{pathD+=(i?'L':'M')+p.x.toFixed(1)+','+p.y.toFixed(1);});
+        areaD=pathD+` L${pts[pts.length-1].x.toFixed(1)},${pad.top+ph} L${pts[0].x.toFixed(1)},${pad.top+ph} Z`;
+
+        let html='';
+        // 预警线
+        const wy = pad.top+ph-((30-minV)/range)*ph;
+        if(wy>pad.top&&wy<pad.top+ph){
+            html+=`<line x1="${pad.left}" y1="${wy.toFixed(1)}" x2="${pad.left+pw}" y2="${wy.toFixed(1)}" stroke="#ef4444" stroke-dasharray="4,3" stroke-width="1" opacity=".4"/>`;
         }
-
-        const W = 480, H = 200;
-        const pad = {top: 20, right: 20, bottom: 30, left: 20};
-        const pw = W - pad.left - pad.right;
-        const ph = H - pad.top - pad.bottom;
-
-        const values = history.map(h => h.kwh).filter(v => v != null);
-        if (!values.length) return;
-
-        const maxKwh = Math.max(...values, 100);
-        const minKwh = Math.min(...values, 0);
-        const range = maxKwh - minKwh || 1;
-
-        // 构建点坐标
-        const points = history.map((h, i) => {
-            const x = pad.left + (history.length === 1 ? pw/2 : (i / (history.length - 1)) * pw);
-            const y = pad.top + ph - ((h.kwh - minKwh) / range) * ph;
-            return {x, y, kwh: h.kwh, time: h.time};
-        });
-
-        // 生成 path
-        let pathD = '';
-        points.forEach((p, i) => {
-            pathD += (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1);
-        });
-
-        // 填充区域
-        let areaD = pathD;
-        const lastX = points[points.length-1].x;
-        areaD += ` L${lastX.toFixed(1)},${pad.top+ph} L${points[0].x.toFixed(1)},${pad.top+ph} Z`;
-
-        const now = new Date();
-        let html = '';
-
-        // 阈值线 (30度告警线)
-        const warnY = pad.top + ph - ((30 - minKwh) / range) * ph;
-        if (warnY > pad.top && warnY < pad.top + ph) {
-            html += `<line x1="${pad.left}" y1="${warnY.toFixed(1)}" x2="${pad.left+pw}" y2="${warnY.toFixed(1)}" stroke="#ef4444" stroke-dasharray="5,3" stroke-width="1" opacity="0.5"/>`;
-            html += `<text x="${pad.left+pw}" y="${warnY.toFixed(1)}" fill="#ef4444" font-size="9" text-anchor="end" dx="-2" dy="-2">30</text>`;
+        // 网格
+        for(let i=0;i<=4;i++){
+            const y=pad.top+(ph/4)*i;
+            html+=`<line x1="${pad.left}" y1="${y.toFixed(1)}" x2="${pad.left+pw}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.03)" stroke-width="1"/>`;
         }
-
-        // 网格线
-        for (let i = 0; i <= 4; i++) {
-            const y = pad.top + (ph / 4) * i;
-            const val = maxKwh - (range / 4) * i;
-            html += `<line x1="${pad.left}" y1="${y.toFixed(1)}" x2="${pad.left+pw}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.04)" stroke-width="1"/>`;
-            html += `<text x="${pad.left-4}" y="${y.toFixed(1)}" fill="#6b7280" font-size="9" text-anchor="end" dy="3">${val.toFixed(0)}</text>`;
-        }
-
-        // 填充区域
-        html += `<path d="${areaD}" fill="url(#grad)" opacity="0.3"/>`;
-        html += `<defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/></linearGradient></defs>`;
-
-        // 折线
-        html += `<path d="${pathD}" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/>`;
-
-        // 数据点
-        points.forEach((p, i) => {
-            const color = p.kwh < 30 ? '#ef4444' : (p.kwh < 80 ? '#f59e0b' : '#10b981');
-            html += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="${color}" stroke="#141820" stroke-width="1"/>`;
+        // 渐变填充
+        html+=`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/></linearGradient></defs>`;
+        html+=`<path d="${areaD}" fill="url(#g)" opacity=".25"/>`;
+        html+=`<path d="${pathD}" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/>`;
+        // 点
+        pts.forEach(p=>{
+            const c=p.kwh<30?'#ef4444':(p.kwh<80?'#f59e0b':'#10b981');
+            html+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="${c}" stroke="#141820" stroke-width="1.5"/>`;
+            html+=`<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)-8}" fill="${c}" font-size="9" text-anchor="middle">${p.kwh.toFixed(1)}</text>`;
         });
-
-        // X 轴标签
-        const step = Math.max(1, Math.floor(history.length / 6));
-        history.forEach((h, i) => {
-            if (i % step === 0 || i === history.length - 1) {
-                const x = pad.left + (history.length === 1 ? pw/2 : (i / (history.length - 1)) * pw);
-                const label = fmtTime(h.time).slice(0, 5);
-                html += `<text x="${x.toFixed(1)}" y="${H-6}" fill="#6b7280" font-size="8" text-anchor="middle">${label}</text>`;
+        // X 标签
+        pts.forEach((p,i)=>{
+            if(i%Math.max(1,Math.floor(recent.length/6))===0||i===recent.length-1){
+                html+=`<text x="${p.x.toFixed(1)}" y="${H-6}" fill="#6b7280" font-size="8" text-anchor="middle">${p.date.slice(5)}</text>`;
             }
         });
 
-        svg.innerHTML = html;
+        svg.innerHTML=html;
     }
 
-    // ===== 历史表格 =====
-    function renderHistory(history) {
-        const tbody = document.getElementById('historyBody');
-        if (!history || !history.length) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:16px">暂无记录</td></tr>';
+    // ===== 每日卡片 =====
+    function renderDaily(days) {
+        const container = document.getElementById('dailyList');
+        if(!days.length){
+            container.innerHTML='<div class="day-card"><div class="day-header" style="justify-content:center;color:var(--muted);font-size:.78rem">暂无历史数据</div></div>';
             return;
         }
-        const reversed = [...history].reverse().slice(0, 30);
-        tbody.innerHTML = reversed.map((h, i) => {
-            const cls = kwhClass(h.kwh);
-            let delta = '';
-            if (i < reversed.length - 1) {
-                const prev = reversed[i + 1];
-                const diff = (h.kwh - prev.kwh).toFixed(2);
-                if (diff < 0) delta = `<span class="h-delta down">${diff}</span>`;
-                else if (diff > 0) delta = `<span class="h-delta up">+${diff}</span>`;
-                else delta = '<span class="h-delta flat">-</span>';
+
+        // 计算全局 max 用于条形图比例
+        const allKwh = days.flatMap(d=>d.items.map(i=>i.kwh)).filter(v=>v!=null);
+        const globalMax = Math.max(...allKwh, 100);
+
+        container.innerHTML = days.map((day, di) => {
+            const kwh = day.last.kwh;
+            const pct = Math.min(100, ((kwh||0)/globalMax)*100);
+            const c = cls(kwh);
+            const isToday = day.date === dayKey(new Date().toISOString());
+
+            // 日消耗 (首条 - 末条)
+            let consumeHtml = '';
+            if (day.items.length >= 2 && day.first.kwh != null && day.last.kwh != null) {
+                const diff = (day.first.kwh - day.last.kwh).toFixed(2);
+                const sign = diff > 0 ? '-' : (diff < 0 ? '+' : '');
+                consumeHtml = `<span class="day-consum" style="color:${diff>0.01?'var(--red)':(diff<-0.01?'var(--green)':'var(--muted)')}">${sign}${Math.abs(diff)}度</span>`;
             }
-            return `<tr>
-                <td style="color:var(--muted)">${fmtTime(h.time)}</td>
-                <td class="h-kwh ${cls}">${h.kwh != null ? h.kwh + ' 度' : '?'}</td>
-                <td>${delta}</td>
-            </tr>`;
+
+            // 小时明细
+            const hourRows = day.items.map(h => {
+                const hpct = Math.min(100, ((h.kwh||0)/globalMax)*100);
+                return `<div class="hour-row">
+                    <span class="hour-time">${fmtHM(h.time)}</span>
+                    <div class="hour-bar-bg"><div class="hour-bar-fill ${cls(h.kwh)}" style="width:${hpct}%"></div></div>
+                    <span class="hour-kwh" style="color:${h.kwh<30?'var(--red)':(h.kwh<80?'var(--accent)':'var(--green)')}">${h.kwh!=null?h.kwh.toFixed(2):'?'} 度</span>
+                </div>`;
+            }).join('');
+
+            const activeClass = di === 0 ? ' active' : '';
+
+            return `<div class="day-card${activeClass}" data-index="${di}">
+                <div class="day-header" onclick="toggleDay(this.parentElement)">
+                    <span class="day-date">${isToday?'今天':day.date.slice(5)}</span>
+                    <div class="day-bar-wrap"><div class="day-bar-fill ${c}" style="width:${pct}%"></div></div>
+                    <span class="day-kwh" style="color:${kwh<30?'var(--red)':(kwh<80?'var(--accent)':'var(--green)')}">${kwh!=null?kwh.toFixed(2):'?'} 度</span>
+                    ${consumeHtml}
+                    <span class="day-arrow">▶</span>
+                </div>
+                <div class="day-detail">
+                    ${day.items.length>1
+                        ? `<div class="hour-list">${hourRows}</div>`
+                        : '<div class="day-empty">仅一条记录</div>'}
+                </div>
+            </div>`;
         }).join('');
     }
 
-    // ===== 主加载 =====
-    async function loadData(silent) {
+    function toggleDay(card) {
+        const wasActive = card.classList.contains('active');
+        // 关闭所有
+        document.querySelectorAll('.day-card.active').forEach(c=>c.classList.remove('active'));
+        // 如果之前没展开，展开当前
+        if(!wasActive) card.classList.add('active');
+    }
+
+    // ===== 主逻辑 =====
+    async function load(silent) {
         try {
-            const r = await fetch(DATA_URL + '?t=' + Date.now());
-            if (!r.ok) throw new Error('HTTP ' + r.status);
+            const r = await fetch(DATA_URL+'?t='+Date.now());
+            if(!r.ok) throw new Error('HTTP '+r.status);
             const d = await r.json();
 
-            // 更新主卡片
+            // 卡片
             const kwh = d.balance_kwh;
-            const numEl = document.getElementById('kwhVal');
-            numEl.textContent = kwh != null ? kwh : '?';
-            numEl.className = 'num ' + kwhClass(kwh);
+            const nEl = document.getElementById('kwhVal');
+            nEl.textContent = kwh!=null?kwh:'?';
+            nEl.className='num '+cls(kwh);
+            document.getElementById('tenant').textContent=d.tenant||'--';
+            document.getElementById('upTime').textContent=ago(d.updated_at);
+            document.getElementById('statusDot').className='dot '+(d.is_error?'err':'ok');
 
-            document.getElementById('tenant').textContent = d.tenant || '--';
-            document.getElementById('upTime').textContent = ago(d.updated_at);
-            document.getElementById('statusDot').className = 'dot ' + (d.is_error ? 'err' : 'ok');
+            const eb = document.getElementById('errorBox');
+            if(d.is_error){eb.style.display='block';eb.textContent='⚠️ '+(d.full_text||'查询异常');}
+            else eb.style.display='none';
 
-            document.getElementById('errorBox').style.display = d.is_error ? 'block' : 'none';
-            if (d.is_error) {
-                document.getElementById('errorBox').textContent = '⚠️ ' + (d.full_text || '查询异常');
-            }
+            // 分组
+            const days = groupByDay(d.history||[]);
+            drawTrend(days);
+            renderDaily(days);
 
-            // 趋势图
-            drawTrend(d.history || []);
-            renderHistory(d.history || []);
-
-            // 更新手动触发按钮
-            document.getElementById('btnTrigger').href =
+            document.getElementById('btnTrigger').href=
                 `https://github.com/${REPO}/actions/workflows/update-data.yml`;
 
-            if (!silent) {
-                document.getElementById('autoRefresh').textContent =
-                    '刚刚刷新 · 每5分钟自动更新';
-            }
-        } catch (e) {
+            if(!silent) document.getElementById('refreshHint').textContent='刚刚刷新 · 每5分钟';
+        } catch(e) {
             console.error(e);
-            document.getElementById('errorBox').style.display = 'block';
-            document.getElementById('errorBox').textContent = '⚠️ 数据加载失败';
+            document.getElementById('errorBox').style.display='block';
+            document.getElementById('errorBox').textContent='⚠️ 数据加载失败';
         }
     }
 
-    // 初始加载
-    loadData();
-
-    // 定时刷新
-    setInterval(() => loadData(true), REFRESH_INTERVAL);
+    load();
+    setInterval(()=>load(true), REFRESH);
 </script>
 </body>
 </html>
