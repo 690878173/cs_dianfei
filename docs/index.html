@@ -132,7 +132,20 @@
         if(v==null)return'';
         return v<30?'low':(v<80?'mid':'ok');
     }
-    function dayKey(iso) { return iso.slice(0,10); }
+    // 用北京时间(UTC+8)取日期键，避免跨天归组错误
+    function dayKey(iso) {
+        const d = new Date(iso);
+        return new Date(d.getTime() + 8*3600000).toISOString().slice(0,10);
+    }
+    function fmtDayLabel(isoOrDate) {
+        const d = new Date(isoOrDate);
+        return new Date(d.getTime() + 8*3600000).toISOString().slice(5,10);
+    }
+    // 判断是否为「今天」(北京时间)
+    function isTodayBJ(dateStr) {
+        const now = new Date();
+        return dateStr === new Date(now.getTime() + 8*3600000).toISOString().slice(0,10);
+    }
 
     // ===== 按天分组 =====
     function groupByDay(history) {
@@ -233,7 +246,7 @@
             const kwh = day.last.kwh;
             const pct = Math.min(100, ((kwh||0)/globalMax)*100);
             const c = cls(kwh);
-            const isToday = day.date === dayKey(new Date().toISOString());
+            const isToday = isTodayBJ(day.date);
 
             // 日消耗 (首条 - 末条)
             let consumeHtml = '';
@@ -257,7 +270,7 @@
 
             return `<div class="day-card${activeClass}" data-index="${di}">
                 <div class="day-header" onclick="toggleDay(this.parentElement)">
-                    <span class="day-date">${isToday?'今天':day.date.slice(5)}</span>
+                    <span class="day-date">${isToday?'今天':fmtDayLabel(day.date)}</span>
                     <div class="day-bar-wrap"><div class="day-bar-fill ${c}" style="width:${pct}%"></div></div>
                     <span class="day-kwh" style="color:${kwh<30?'var(--red)':(kwh<80?'var(--accent)':'var(--green)')}">${kwh!=null?kwh.toFixed(2):'?'} 度</span>
                     ${consumeHtml}
