@@ -248,11 +248,15 @@
             const c = cls(kwh);
             const isToday = isTodayBJ(day.date);
 
-            // 日消耗 = 前一天末值 - 当天末值 (day从新到旧排列)
+            // 日消耗 = 前一天末值 - 当天末值；最旧一天回退到当天首末差
             let consumeHtml = '';
-            const prevDay = days[di + 1]; // 更早的一天
+            const prevDay = days[di + 1];
             if (prevDay && prevDay.last.kwh != null && kwh != null) {
                 const diff = (prevDay.last.kwh - kwh).toFixed(2);
+                const sign = diff > 0 ? '-' : (diff < 0 ? '+' : '');
+                consumeHtml = `<span class="day-consum" style="color:${diff>0.01?'var(--red)':(diff<-0.01?'var(--green)':'var(--muted)')}">${sign}${Math.abs(diff)}度</span>`;
+            } else if (!prevDay && day.first.kwh != null && kwh != null) {
+                const diff = (day.first.kwh - kwh).toFixed(2);
                 const sign = diff > 0 ? '-' : (diff < 0 ? '+' : '');
                 consumeHtml = `<span class="day-consum" style="color:${diff>0.01?'var(--red)':(diff<-0.01?'var(--green)':'var(--muted)')}">${sign}${Math.abs(diff)}度</span>`;
             }
